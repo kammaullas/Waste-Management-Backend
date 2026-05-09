@@ -13,12 +13,17 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors(
-    {
-        origin:"http://localhost:5173",
-        credentials: true,
-    }
-));
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow localhost, Vercel deployments, and missing origins
+        if (!origin || origin.startsWith("http://localhost:") || origin.endsWith(".vercel.app") || origin === process.env.FRONTEND_URL) {
+            callback(null, origin || true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+}));
 
 
 const PORT = process.env.PORT || 5001;
